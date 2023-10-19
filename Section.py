@@ -22,7 +22,7 @@ if introspection_type == START_OVER or introspection_type == REUSE_NO_INTROSPECT
         departmentAbbreviation: Mapped[str] = mapped_column("department_abbreviation", nullable=False, primary_key=True)
         # foreign key constraint from courses in __table_args__
         courseNumber: Mapped[int] = mapped_column("course_number", nullable=False, primary_key=True)
-        course: Mapped["Course"] = relationship(back_populates="sections",cascade="all, save-update, delete-orphan" )
+        course: Mapped["Course"] = relationship(back_populates="sections" )
         sectionNumber: Mapped[int] = mapped_column("section_number", Integer, Identity(start=1, cycle=True),
                                                    nullable=False, primary_key=True)
 
