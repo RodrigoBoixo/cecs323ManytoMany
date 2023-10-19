@@ -4,12 +4,15 @@ from menu_definitions import menu_main, add_menu, delete_menu, list_menu, debug_
 from IntrospectionFactory import IntrospectionFactory
 from db_connection import engine, Session
 from orm_base import metadata
+from sqlalchemy.orm import aliased
 # Note that until you import your SQLAlchemy declarative classes, such as Student, Python
 # will not execute that code, and SQLAlchemy will be unaware of the mapped table.
 from Department import Department
+from Enrollment import Enrollment
 from Course import Course
 from Major import Major
 from Student import Student
+from Section import Section
 from StudentMajor import StudentMajor
 from Option import Option
 from Menu import Menu
@@ -575,6 +578,194 @@ def session_rollback(sess):
         Option("No, I hit this option by mistake", "pass")
     ])
     exec(confirm_menu.menu_prompt())
+
+
+#NEW FUNCTIONS-----------------------------------------------------------------------------------------------------------------------------------------------------
+def select_section(sess: Session):
+    """
+    HELPER FUNCTION FOR DELETE SECTION
+    """
+    found = False
+    section_id = -1
+    while not found:
+        try:
+            section_id = int(input("Enter the Section Number to delete--> "))
+            section = sess.query(Section).filter(Section.sectionNumber == section_id).first()
+            if section:
+                found = True
+            else:
+                print("No Section found with that ID. Try again.")
+        except ValueError:
+            print("Invalid input. Please enter a valid Section Number.")
+    return section
+
+def delete_section(session: Session):
+    """ Delete a section """
+    section = select_section(session)
+    if section:
+        # Check for enrollments
+        enrollment_count = session.query(Enrollment).filter(Enrollment.sectionNumber == section.sectionNumber).count()
+        if enrollment_count > 0:
+            print("WARNING: CANNOT DELETE SECTION WITH ENROLLMENTS.")
+        else:
+            # Check if there are any students enrolled in the section
+            students_enrolled = section.students
+            if students_enrolled:
+                print("WARNING: CANNOT DELETE SECTION WITH ENROLLED STUDENTS.")
+            else:
+                session.delete(section)
+                session.flush()
+                print(f"Section ID {section.sectionID} has been deleted.")
+    else:
+        print("Section not found. Cannot delete.")
+
+
+
+def select_student(sess: Session) -> Student:
+    """
+    Helper funtion for delete_student.
+    Select student will pick the student to delete
+    """
+    found = False
+    student_id = -1
+    while not found:
+        try:
+            student_id = int(input("Enter the Student ID--> "))
+            student = sess.query(Student).filter(Student.studentID == student_id).first()
+            if student:
+                found = True
+            else:
+                print("No student found with that ID. Try again.")
+        except ValueError:
+            print("Invalid input. Please enter a valid Student ID.")
+    return student
+
+
+def delete_student(session: Session):
+    """
+    Delete a student
+    """
+    student = select_student(session)
+    if student: #check if student found
+        enrollments_count = session.query(Enrollment).filter(Enrollment.studentId == student.studentID).count()
+        if enrollments_count > 0:
+            print(f"Sorry, this student is registered in {enrollments_count} sections. "
+                  "You cannot delete a student with registrations.")
+        else:
+            session.delete(student)
+    else:
+        print("Student not found. Cannot delete.")
+
+
+def enroll_student_to_section(session: Session):
+    """
+    enrolls student to a section, selecting student first, then section
+    """
+    student = select_student(session)
+    section = select_section(session)
+    if student and section: #check to see if valid student and section
+        enrollment = Enrollment(student=student, section=section)
+        session.add(enrollment)
+        session.flush()
+        print(f"Enrolled Student ID {student.studentID} in Section {section.sectionID}")
+
+
+def enroll_section_to_student(session: Session):
+    """
+    enroll section to student, by selecting section first, then student
+    """
+    section = select_section(session)
+    student = select_student(session)
+    if student and section: #check if valid student and section
+        enrollment = Enrollment(student=student, section=section)
+        session.add(enrollment)
+        session.flush()
+        print(f"Added Section {section.sectionID} to Student ID {student.studentID}")
+
+
+def unenroll_student_from_section(session: Session):
+    """
+    unenroll studet from section, pick student then section after
+    """
+    student = select_student(session)
+    section = select_section(session)
+    if student and section: #check if student is actually enrolled
+        student.remove_enrollment(section)
+        session.flush()
+        print(f"Unenrolled Student ID {student.studentID} from Section {section.sectionNumber}")
+
+
+def unenroll_section_from_student(session: Session):
+    """
+    unenroll section from student, pick section first, then student
+    """
+    section = select_section(session)
+    student = select_student(session)
+    if student and section: #check if student is actually enrolled
+        section.remove_enrollment(student)
+        session.flush()
+        print(f"Unenrolled Section {section.sectionNumber} from Student ID {student.studentID}")
+
+
+def list_student_enrollments(session: Session):
+    """
+    lists all enrollments for particualr student selected
+    """
+    student = select_student(session)
+    if student:
+        enrollment_alias = aliased(Enrollment)
+        section_alias = aliased(Section)
+
+        enrollments = session.query(enrollment_alias, section_alias) \
+            .join(section_alias, enrollment_alias.sectionID == section_alias.sectionID) \
+            .filter(enrollment_alias.studentID == student.studentID).all()
+
+        if enrollments:
+            print(f"Enrollments for Student ID {student.studentID}:")
+            for enrollment, section in enrollments:
+                print(f"Section ID: {section.sectionID}, Section Name: {section.sectionName}")
+        else:
+            print(f"Student ID {student.studentID} is not enrolled in any sections.")
+    else:
+        print("Student not found. Cannot list enrollments.")
+
+
+def list_section_enrollments(session: Session):
+    """
+    Select a section and list the students enrolled in that section.
+    :param session: The connection to the database.
+    :return: None
+    """
+    section = select_section(session)
+    if section:
+        # Create aliases for the Enrollment and Student tables
+        enrollment_alias = aliased(Enrollment)
+        student_alias = aliased(Student)
+
+        # Join Enrollment and Student tables using aliases
+        enrollments = session.query(enrollment_alias, student_alias)\
+            .join(student_alias, enrollment_alias.studentID == student_alias.studentID)\
+            .filter(enrollment_alias.sectionID == section.sectionID).all()
+
+        if enrollments:
+            print(f"Students enrolled in Section {section.sectionID} - {section.sectionName}:")
+            for enrollment, student in enrollments:
+                print(f"Student ID: {student.studentID}, Student Name: {student.fullName()}")
+        else:
+            print(f"No students are enrolled in Section {section.sectionID} - {section.sectionName}.")
+    else:
+        print("Section not found. Cannot list enrollments.")
+
+
+
+
+
+
+
+
+
+
+
 
 
 if __name__ == '__main__':
