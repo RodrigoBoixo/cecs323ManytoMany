@@ -1,6 +1,7 @@
 from Course import Course
 from orm_base import Base
 from db_connection import engine
+from typing import List
 from IntrospectionFactory import IntrospectionFactory
 from sqlalchemy import UniqueConstraint, ForeignKeyConstraint
 from sqlalchemy import String, Integer, Column, Identity
@@ -21,7 +22,7 @@ if introspection_type == START_OVER or introspection_type == REUSE_NO_INTROSPECT
         departmentAbbreviation: Mapped[str] = mapped_column("department_abbreviation", nullable=False, primary_key=True)
         # foreign key constraint from courses in __table_args__
         courseNumber: Mapped[int] = mapped_column("course_number", nullable=False, primary_key=True)
-        course: Mapped["Course"] = relationship(back_populates="sections",cascade="all, save-update, delete-orphan")
+        course: Mapped["Course"] = relationship(back_populates="sections",cascade="all, save-update, delete-orphan" )
         sectionNumber: Mapped[int] = mapped_column("section_number", Integer, Identity(start=1, cycle=True),
                                                    nullable=False, primary_key=True)
 
@@ -37,6 +38,7 @@ if introspection_type == START_OVER or introspection_type == REUSE_NO_INTROSPECT
         schedule: Mapped[str] = mapped_column("schedule", String(6), nullable=False)
         startTime: Mapped[Time] = mapped_column("start_time", Time, nullable=False)
         instructor: Mapped[str] = mapped_column("instructor", String(80), nullable=False)
+        students: Mapped[List["Enrollment"]] = relationship(back_populates="section",cascade="all, save-update, delete-orphan")
 
         __table_args__ = (UniqueConstraint("section_year", "semester", "schedule", "start_time", "building", "room",
                                            name="sections_uk_01"),
