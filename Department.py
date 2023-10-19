@@ -16,16 +16,21 @@ class Department(Base):
     __tablename__ = "departments"  # Give SQLAlchemy th name of the table.
     abbreviation: Mapped[str] = mapped_column('abbreviation', String,
                                               nullable=False, primary_key=True)
-    name: Mapped[str] = mapped_column('name', String(50), nullable=False)
-    # The list of majors in this department
-    majors: Mapped[List["Major"]] = relationship(back_populates="department")
-    # The list of courses offered by this department
     courses: Mapped[List["Course"]] = relationship(back_populates="department")
+    majors: Mapped[List["Major"]] = relationship(back_populates="department")
+    name: Mapped[str] = mapped_column('name', String(50), nullable=False)
+    chairName: Mapped[str] = mapped_column('chair_name', String(80), nullable=False)
+    building: Mapped[str] = mapped_column('building', String(10), nullable=False)
+    office: Mapped[int] = mapped_column('office', Integer, nullable=False)
+    description: Mapped[str] = mapped_column('description', String(80), nullable=False)
+
     # __table_args__ can best be viewed as directives that we ask SQLAlchemy to
     # send to the database.  In this case, that we want two separate uniqueness
     # constraints (candidate keys).
-    __table_args__ = (UniqueConstraint("name", name="departments_uk_01"), )
-
+    __table_args__ = (
+    UniqueConstraint("name", name="departments_uk_01"), UniqueConstraint("chair_name", name="departments_uk_02"),
+    UniqueConstraint("building", "office", name="departments_uk_03"),
+    UniqueConstraint("description", name="departments_uk_04"))
     def __init__(self, abbreviation: str, name: str):
         self.abbreviation = abbreviation
         self.name = name

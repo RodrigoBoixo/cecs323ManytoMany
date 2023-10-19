@@ -36,13 +36,14 @@ def list_objects(sess: Session):
         exec(list_action)
 
 
-def add_department(session: Session):
+def add_department(session):
     """
     Prompt the user for the information for a new department and validate
     the input to make sure that we do not create any duplicates.
     :param session: The connection to the database.
     :return:        None
     """
+    '''
     unique_name: bool = False
     unique_abbreviation: bool = False
     name: str = ''
@@ -62,6 +63,48 @@ def add_department(session: Session):
                 print("We already have a department with that abbreviation.  Try again.")
     new_department = Department(abbreviation, name)
     session.add(new_department)
+    '''
+
+    unique_abbr = False
+    unique_chair = False
+    unique_office = False
+    unique_desc = False
+    departmentName: str = ''
+    abbreviation: str = ''
+    chairName: str = ''
+    building: str = ''
+    office: int = 0
+    description: str = ''
+
+    while not unique_abbr or not unique_chair or not unique_office or not unique_desc:
+        departmentName = input("Department name --> ")
+        abbreviation = input("Department's abbreviation --> ")
+        chairName = input("Department Chair name --> ")
+        building = input("Building name --> ")
+        office = int(input("Office number --> "))
+        description = input("Description of department --> ")
+
+        abbr_count = session.query(Department).filter(Department.abbreviation == abbreviation).count()
+        chair_count = session.query(Department).filter(Department.chairName == chairName).count()
+        office_count = session.query(Department).filter(Department.building == building,
+                                                        Department.office == office).count()
+        desc_count = session.query(Department).filter(Department.description == description).count()
+
+        unique_abbr = abbr_count == 0
+        unique_chair = chair_count == 0
+        unique_office = office_count == 0
+        unique_desc = desc_count == 0
+
+        if not unique_abbr:
+            print("We already have a department by that abbreviation. Try again.")
+        elif not unique_chair:
+            print("The named individual is already a chair of a different department. Try again.")
+        elif not unique_office:
+            print("That office room is already occupied by another department. Try again.")
+        elif not unique_desc:
+            print("That description matches the description of another department. Try again.")
+    newDepartment = Department(abbreviation, departmentName, chairName, building, office, description)
+    session.add(newDepartment)
 
 
 def add_course(session: Session):
