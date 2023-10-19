@@ -31,9 +31,14 @@ class Department(Base):
     UniqueConstraint("name", name="departments_uk_01"), UniqueConstraint("chair_name", name="departments_uk_02"),
     UniqueConstraint("building", "office", name="departments_uk_03"),
     UniqueConstraint("description", name="departments_uk_04"))
-    def __init__(self, abbreviation: str, name: str):
+
+    def __init__(self, abbreviation: str, name: str, chair_name: str, building: str, office: int, description: str):
         self.abbreviation = abbreviation
         self.name = name
+        self.chairName = chair_name
+        self.building = building
+        self.office = office
+        self.description = description
 
     def add_course(self, course):
         if course not in self.courses:
