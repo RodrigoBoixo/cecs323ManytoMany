@@ -67,5 +67,9 @@ class Student(Base):
                 self.majors.remove(next_major)
                 return
 
+    def remove_section(self,section):
+        if section in self.sections:
+            self.sections.remove(section)
+
     def __str__(self):
         return f"Student ID: {self.studentID} name: {self.lastName}, {self.firstName} e-mail: {self.email}"
