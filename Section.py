@@ -9,6 +9,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship, column_property
 from sqlalchemy import Table
 from sqlalchemy.types import Time
 from constants import START_OVER, REUSE_NO_INTROSPECTION, INTROSPECT_TABLES
+from Student import Student
 import Enrollment
 
 table_name: str = "sections"  # The physical name of this table
@@ -60,6 +61,34 @@ if introspection_type == START_OVER or introspection_type == REUSE_NO_INTROSPECT
             self.startTime = startTime
             self.instructor = instructor
 
+        def set_course(self, course: Course):
+            # Questioning the addition of this function into Section.py, not stated in assignment guidelines, but 'feels' neccessary to set relationship between course and section. Not sure if it is neccessary though.
+            self.course = course
+            self.departmentAbbreviation = course.departmentAbbreviation
+            self.courseNumber = course.courseNumber
+
+        def remove_student(self, student):
+            """Removes a student from the section.
+
+            Args:
+                student: The student to remove.
+            """
+
+            self.students.remove(student)
+
+        def __str__(self):
+            return f"\nSection Number: {self.sectionNumber}" \
+                   f"\nDepartment abbr: {self.departmentAbbreviation}," \
+                   f"Course Number: {self.courseNumber}," \
+                   f"Semester: {self.semester}" \
+                   f"\nSection Year: {self.sectionYear}," \
+                   f"Building: {self.building}," \
+                   f"Room: {self.room}" \
+                   f"\nSchedule: {self.schedule}," \
+                   f"Start Time: {self.startTime}," \
+                   f"Instructor: {self.instructor}"
+
+'''
 elif introspection_type == INTROSPECT_TABLES:
     class Section(Base):
         __table__ = Table(table_name, Base.metadata, autoload_with=engine)
@@ -82,12 +111,22 @@ elif introspection_type == INTROSPECT_TABLES:
             self.startTime = startTime
             self.instructor = instructor
 
+        def remove_student(self, student: Student):
+            """Removes a student from the section.
+
+            Args:
+                student: The student to remove.
+            """
+
+            self.students.remove(student)
+
 
 def set_course(self, course: Course):
     # Questioning the addition of this function into Section.py, not stated in assignment guidelines, but 'feels' neccessary to set relationship between course and section. Not sure if it is neccessary though.
     self.course = course
     self.departmentAbbreviation = course.departmentAbbreviation
     self.courseNumber = course.courseNumber
+
 
 def add_student(self,student):
     found = 0
@@ -96,6 +135,17 @@ def add_student(self,student):
             found = 1
     if found == 0:
         Enrollment(self,student)
+
+
+def remove_student(self,student):
+    for student in self.student:
+        if student == self.student:
+            self.student.remove(student)
+            return
+            
+
+
+    self.students.remove(student)
 def __str__(self):
     return f"\nSection Number: {self.sectionNumber}" \
            f"\nDepartment abbr: {self.departmentAbbreviation}," \
@@ -115,7 +165,7 @@ setattr(Section, 'set_course', set_course)
 setattr(Section, '__str__', __str__)
 
 
-
+'''
 
 
 
