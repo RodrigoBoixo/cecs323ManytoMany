@@ -43,9 +43,10 @@ menu_main = Menu('main', 'Please select one of the following options:', [
     Option("Boilerplate Data", "boilerplate(sess)"),
     Option("Commit", "sess.commit()"),
     Option("Rollback", "session_rollback(sess)"),
-    Option("Exit this application", "pass"),
     Option("Enroll and/or Unenroll", enroll_menu),
-    Option("List Enrollments", list_enrollments_menu)
+    Option("List Enrollments", list_enrollments_menu),
+    Option("Exit this application", "pass")
+
 ])
 
 add_menu = Menu('add', 'Please indicate what you want to add:', [
