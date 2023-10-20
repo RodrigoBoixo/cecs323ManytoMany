@@ -347,6 +347,7 @@ def delete_student(session: Session):
     point.
     """
     session.delete(student)
+    print('delete student')
 
 
 def delete_department(session: Session):
