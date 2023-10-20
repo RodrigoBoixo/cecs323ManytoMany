@@ -15,7 +15,7 @@ class Enrollment(Base):
     __tablename__ = "enrollments"
     student: Mapped["Student"] = relationship(back_populates = "sections")
     section: Mapped["Section"] = relationship(back_populates = "students")
-    studentId: Mapped[int] = mapped_column("student_id", Integer, Identity(start=1, cycle=True), primary_key=True)
+    studentID: Mapped[int] = mapped_column("student_id", Integer, Identity(start=1, cycle=True), primary_key=True)
     sectionNumber: Mapped[int] = mapped_column("section_number", Integer, Identity(start=1, cycle=True),
                                                nullable=False, primary_key=True)
     courseNumber: Mapped[int] = mapped_column("course_number", nullable=False, primary_key=True)
@@ -30,11 +30,11 @@ class Enrollment(Base):
                       ForeignKeyConstraint([departmentAbbreviation, courseNumber, sectionNumber, sectionYear, semester],
                                            ["sections.department_abbreviation", "sections.course_number",
                                             "sections.section_number","sections.section_year", "sections.semester"]),
-                      ForeignKeyConstraint([studentId], ["students.student_id"]))
+                      ForeignKeyConstraint([studentID], ["students.student_id"]))
 
     def __int__(self, student, section):
         self.student = student
-        self.studentId = student.studentID
+        self.studentID = student.studentID
         self.section = section
         self.sectionNumber = section.sectionNumber
         self.sectionYear = section.sectionYear

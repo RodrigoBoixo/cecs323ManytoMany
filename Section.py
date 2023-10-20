@@ -9,6 +9,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship, column_property
 from sqlalchemy import Table
 from sqlalchemy.types import Time
 from constants import START_OVER, REUSE_NO_INTROSPECTION, INTROSPECT_TABLES
+import Enrollment
 
 table_name: str = "sections"  # The physical name of this table
 # Find out whether the user is introspecting or starting over
@@ -88,7 +89,13 @@ def set_course(self, course: Course):
     self.departmentAbbreviation = course.departmentAbbreviation
     self.courseNumber = course.courseNumber
 
-
+def add_student(self,student):
+    found = 0
+    for student in self.student:
+        if student == self.student:
+            found = 1
+    if found == 0:
+        Enrollment(self,student)
 def __str__(self):
     return f"\nSection Number: {self.sectionNumber}" \
            f"\nDepartment abbr: {self.departmentAbbreviation}," \
@@ -102,5 +109,13 @@ def __str__(self):
            f"Instructor: {self.instructor}"
 
 
+
+
 setattr(Section, 'set_course', set_course)
 setattr(Section, '__str__', __str__)
+
+
+
+
+
+

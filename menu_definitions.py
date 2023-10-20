@@ -43,8 +43,8 @@ menu_main = Menu('main', 'Please select one of the following options:', [
     Option("Boilerplate Data", "boilerplate(sess)"),
     Option("Commit", "sess.commit()"),
     Option("Rollback", "session_rollback(sess)"),
-    Option("Enroll and/or Unenroll", enroll_menu),
-    Option("List Enrollments", list_enrollments_menu),
+    #Option("Enroll and/or Unenroll", "enroll_menu"),
+    #Option("List Enrollments", "list_enrollments_menu"),
     Option("Exit this application", "pass")
 
 ])
@@ -56,6 +56,9 @@ add_menu = Menu('add', 'Please indicate what you want to add:', [
     Option("Student", "add_student(sess)"),
     Option("Student to Major", "add_student_major(sess)"),
     Option("Major to Student", "add_major_student(sess)"),
+    Option("Section","add_section(sess)"),
+    Option("Enroll a Student in a Section", "enroll_student_to_section(sess)"),
+    Option("Enroll a Section to Student", "enroll_section_to_student(sess)"),
     Option("Exit", "pass")
 ])
 
@@ -66,7 +69,8 @@ delete_menu = Menu('delete', 'Please indicate what you want to delete from:', [
     Option("Student", "delete_student(sess)"),
     Option("Student to Major", "delete_student_major(sess)"),
     Option("Major to Student", "delete_major_student(sess)"),
-
+    Option("Unenroll a Student from a Section", "unenroll_student_from_section(sess)"),
+    Option("Unenroll a Section from a Student", "unenroll_section_from_student(sess)"),
     Option("Section", "delete_section(sess)"), #TO DELETE A SECTION
 
     Option("Exit", "pass")
@@ -79,6 +83,9 @@ list_menu = Menu('list', 'Please indicate what you want to list:', [
     Option("Student", "list_student(sess)"),
     Option("Student to Major", "list_student_major(sess)"),
     Option("Major to Student", "list_major_student(sess)"),
+    Option("List enrollments by selecting a Student", "list_student_enrollments(sess)"),
+    Option("List enrollments by selecting a Section", "list_section_enrollments(sess)"),
+    Option("Section","list_sections(sess)"),
     Option("Exit", "pass")
 ])
 
