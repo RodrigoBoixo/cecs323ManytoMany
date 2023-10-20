@@ -68,13 +68,9 @@ if introspection_type == START_OVER or introspection_type == REUSE_NO_INTROSPECT
             self.courseNumber = course.courseNumber
 
         def remove_student(self, student):
-            """Removes a student from the section.
+            if student in self.students:
+                self.students.remove(student)
 
-            Args:
-                student: The student to remove.
-            """
-
-            self.students.remove(student)
 
         def __str__(self):
             return f"\nSection Number: {self.sectionNumber}" \
